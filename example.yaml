@@ -1,0 +1,17 @@
+- defaults:
+    render:
+      env:
+        spam: eggs
+
+# simple
+- render:
+    ~/.bashrc:
+      env:
+        foo: bar
+
+# file
+- render:
+    ~/.bashrc:
+      file: bashrc
+      env:
+        foo: bar
