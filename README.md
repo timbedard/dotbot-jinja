@@ -15,3 +15,14 @@ Modify your `install` script:
 ```
 
 ## Usage
+
+| Parameter | Explanation |
+| --------- | ----------- |
+|  context  |             |
+|  file     |             |
+|  string   |             |
+
+### Example
+
+```yaml
+```

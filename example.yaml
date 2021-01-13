@@ -1,17 +1,24 @@
 - defaults:
     render:
-      env:
+      context:
         spam: eggs
 
 # simple
 - render:
     ~/.bashrc:
-      env:
+      context:
         foo: bar
 
 # file
 - render:
     ~/.bashrc:
       file: bashrc
-      env:
+      context:
+        foo: bar
+
+# inline
+- render:
+    ~/potato:
+      string: "{{ foo }}"
+      context:
         foo: bar

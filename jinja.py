@@ -1,15 +1,16 @@
+import os
+
 from dotbot import Plugin
 
 try:
-    import jinja2
-except ModuleNotFoundError:
+    from jinja2 import Environment, FileSystemLoader, Template
+except ImportError:
     import sys
-    from pathlib import Path
 
-    parent_path = Path(__file__).parent.absolute()
+    parent_path = os.path.dirname(__file__)
     for submodule in ("jinja", "markupsafe"):
-        sys.path.insert(0, "{}/{}/src".format(parent_path, submodule))
-    import jinja2
+        sys.path.insert(0, "{}/lib/{}/src".format(parent_path, submodule))
+    from jinja2 import Environment, FileSystemLoader, Template
 
 
 class JinjaRender(Plugin):
@@ -27,11 +28,23 @@ class JinjaRender(Plugin):
         success = True
         defaults = self._context.defaults().get("render", {})
 
+        env = Environment(loader=FileSystemLoader(searchpath="."))
+
         for target, config in targets.items():
-            path = ...
-            template = ...
-            env = ...
-            success = self._write(path, self._render(template, env)) and success
+            context = defaults.get("context", {}).copy()
+            # TODO: smartly handle file/string overriding the other from defaults
+            context.update(config.get("context", {}))
+
+            path = Template(target).render(context)  # render path
+
+            if "file" in config:
+                template = env.get_template(config["file"])
+            elif "string" in config:
+                template = Template(config["string"])
+            else:
+                template = env.get_template(self._file_from_target(path))
+
+            success = self._write(path, template.render(context)) and success
 
         if success:
             self._log.info("All files have been generated")
@@ -40,8 +53,14 @@ class JinjaRender(Plugin):
 
         return success
 
-    def _write(self, path, contents):
-        ...
+    def _file_from_target(self, path):
+        basename = os.path.basename(path)
+        if basename.startswith("."):
+            return basename[1:]
+        else:
+            return basename
 
-    def _render(self, template, env):
-        ...
+    def _write(self, path, contents):
+        with open(os.path.expanduser(path), "w") as file:
+            file.write(contents)
+        return True
