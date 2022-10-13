@@ -21,7 +21,7 @@ class JinjaRender(Plugin):
 
     def handle(self, directive, data):
         if directive != self._directive:
-            raise ValueError("JinjaRender cannot handle directive {}".format(directive))
+            raise ValueError("Render cannot handle directive {}".format(directive))
         return self._process(data)
 
     def _process(self, targets):
